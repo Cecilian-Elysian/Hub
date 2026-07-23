@@ -39,6 +39,7 @@ const FILES = [
   'src/utils/format.js',
   'src/utils/notify.js',
   'src/hub-compat.js',
+  'src/styles/tokens.css',
   'src/ui/floating-btn.js',
   'src/ui/panel.js',
   'src/entry/ui.js',
@@ -146,8 +147,10 @@ function build() {
   console.log('Building script...')
   const body = concatFiles(FILES)
   const out = HEADER + '\n' + body
-  checkSyntax(out, 'bookmarks')
-  checkUndefinedReferences(body, 'bookmarks')
+  // 仅对 JS 文件做语法检查，跳过 CSS
+  const jsBody = concatFiles(FILES.filter(f => !f.endsWith('.css')))
+  checkSyntax(jsBody, 'bookmarks')
+  checkUndefinedReferences(jsBody, 'bookmarks')
 
   const outPath = join(__dirname, 'dist', 'bookmarks.user.js')
   writeFileSync(outPath, out, 'utf-8')
@@ -159,8 +162,19 @@ function build() {
 function concatFiles(fileList) {
   const parts = []
   for (const f of fileList) {
-    const content = readFileSync(join(__dirname, f), 'utf-8').trim()
-    parts.push(`// === ${f} ===`)
+    let content = readFileSync(join(__dirname, f), 'utf-8').trim()
+    if (f.endsWith('.css')) {
+      // 把 CSS 包成自执行函数，注入到 <style> 标签
+      content = ';(function() {\n' +
+        '  try {\n' +
+        '    var __style = document.createElement("style");\n' +
+        '    __style.setAttribute("data-cathub-tokens", "' + f.replace(/[^\w.-]/g, '_') + '");\n' +
+        '    __style.textContent = ' + JSON.stringify(content) + ';\n' +
+        '    (document.head || document.documentElement).appendChild(__style);\n' +
+        '  } catch (e) {}\n' +
+        '})();'
+    }
+    parts.push('// === ' + f + ' ===')
     parts.push(content)
     parts.push('')
   }

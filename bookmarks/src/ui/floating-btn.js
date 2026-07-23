@@ -5,44 +5,44 @@ let _isDragging = false
 let _dragOffset = { x: 0, y: 0 }
 
 const BTN_STYLE = `
-#bm-floating-btn {
+[data-bm-btn] {
   position: fixed;
-  z-index: 2147483647;
+  z-index: var(--z-floating);
   height: 44px;
   min-width: 44px;
-  border-radius: 22px;
-  background: #3b82f6;
+  border-radius: var(--r-full);
+  background: var(--brand);
   color: #fff;
   border: none;
   cursor: pointer;
-  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.35);
+  box-shadow: var(--shadow-btn);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   padding: 0 14px;
-  font-size: 14px;
+  font-size: var(--fs-lg);
   font-weight: 500;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: var(--font-stack);
   line-height: 1;
   letter-spacing: 0.5px;
-  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
   user-select: none;
   touch-action: none;
   -webkit-user-select: none;
 }
-#bm-floating-btn:hover {
+[data-bm-btn]:hover {
   transform: scale(1.05);
-  background: #2563eb;
-  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.5);
+  background: var(--brand-hover);
+  box-shadow: var(--shadow-btn-hover);
 }
-#bm-floating-btn svg.bm-icon {
+[data-bm-btn] svg.bm-icon {
   width: 20px;
   height: 20px;
   fill: currentColor;
   flex-shrink: 0;
 }
-#bm-floating-btn .label {
+[data-bm-btn] .label {
   display: inline-block;
   white-space: nowrap;
 }
@@ -64,6 +64,7 @@ function createFloatingButton(onClick) {
     _btn = document.createElement('button')
     _btn.id = 'bm-floating-btn'
     _btn.type = 'button'
+    _btn.setAttribute('data-bm-btn', '')
     _btn.setAttribute('aria-label', '网址收藏')
     _btn.title = '网址收藏'
     _btn.innerHTML = ICON_SVG + '<span class="label">收藏</span>'
@@ -71,9 +72,9 @@ function createFloatingButton(onClick) {
     const pos = ns.config.getConfig('ui.position') || 'bottom-right'
     const positions = {
       'bottom-right': { bottom: '20px', right: '20px' },
-      'bottom-left': { bottom: '20px', left: '20px' },
-      'top-right': { top: '20px', right: '20px' },
-      'top-left': { top: '20px', left: '20px' },
+      'bottom-left':  { bottom: '20px', left: '20px' },
+      'top-right':    { top: '20px', right: '20px' },
+      'top-left':     { top: '20px', left: '20px' },
     }
     Object.assign(_btn.style, positions[pos] || positions['bottom-right'])
 

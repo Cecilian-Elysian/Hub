@@ -6,114 +6,135 @@ let _escListener = null
 let _outsideClickListener = null
 
 const PANEL_STYLE = `
-#bm-panel {
+[data-bm-panel] {
   position: fixed;
   top: 0; right: 0;
-  width: 460px;
+  width: var(--panel-width);
   max-width: 100vw;
   height: 100vh;
-  background: rgba(255,255,255,0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-left: 1px solid rgba(0,0,0,0.08);
-  box-shadow: -4px 0 24px rgba(0,0,0,0.2);
-  z-index: 2147483647;
+  background: var(--panel-bg);
+  -webkit-backdrop-filter: blur(var(--panel-blur));
+  backdrop-filter: blur(var(--panel-blur));
+  border-left: var(--panel-border);
+  box-shadow: var(--shadow-panel);
+  z-index: var(--z-panel);
   display: flex;
   flex-direction: column;
-  animation: bm-slide-in 0.2s ease;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
-  color: #1f1f1f;
+  transform: translateX(100%);
+  transition: transform var(--transition-panel);
+  font-family: var(--font-stack);
+  color: var(--panel-text);
+  font-size: var(--fs-md);
+  line-height: 1.5;
 }
+[data-bm-panel].open { transform: translateX(0); }
 @media (prefers-color-scheme: dark) {
-  #bm-panel { background: rgba(31,31,31,0.7); color: #e0e0e0; border-left-color: rgba(255,255,255,0.08); }
-  #bm-panel .search-bar input { background: #2a2a2a; color: #e0e0e0; border-color: #444; }
-  #bm-panel .toolbar button { border-color: #444; color: #e0e0e0; }
-  #bm-panel .bookmark-item { background: rgba(42,42,42,0.85); border-color: rgba(255,255,255,0.08); }
-  #bm-panel .bookmark-item:hover { background: rgba(60,60,60,0.95); }
-  #bm-panel .folder-select { background: #2a2a2a; color: #e0e0e0; border-color: #444; }
+  [data-bm-panel] { background: rgba(31,31,31,0.88); color: #e0e0e0; border-left-color: rgba(255,255,255,0.08); }
 }
-#bm-panel .header {
+[data-bm-panel] .header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 18px; border-bottom: 1px solid rgba(0,0,0,0.08); flex-shrink: 0;
+  padding: 16px; border-bottom: 1px solid var(--panel-divider); flex-shrink: 0;
 }
-#bm-panel .header h2 { margin: 0; font-size: 17px; font-weight: 600; }
-#bm-panel .header .stats { font-size: 12px; color: #888; margin-top: 2px; }
-#bm-panel .header .actions { display: flex; gap: 6px; }
-#bm-panel .header .actions button, #bm-panel .toolbar button {
-  background: none; border: 1px solid #ddd; border-radius: 6px;
-  padding: 4px 10px; cursor: pointer; font-size: 12px; color: inherit;
+[data-bm-panel] .header h2 { margin: 0; font-size: var(--fs-2xl); font-weight: 600; }
+[data-bm-panel] .header .stats { font-size: var(--fs-sm); color: var(--panel-text-secondary); margin-top: 2px; }
+[data-bm-panel] .header .actions { display: flex; gap: var(--sp-2); }
+[data-bm-panel] .header .actions button, [data-bm-panel] .toolbar button {
+  background: var(--btn-toolbar-bg);
+  border: 1px solid var(--btn-toolbar-border);
+  border-radius: var(--r-sm);
+  padding: 4px 10px; cursor: pointer;
+  font-size: var(--fs-sm); color: var(--btn-toolbar-text);
+  font-family: inherit;
+  transition: background var(--transition-fast);
 }
-#bm-panel .header .actions button:hover, #bm-panel .toolbar button:hover {
-  background: rgba(0,0,0,0.05);
+[data-bm-panel] .header .actions button:hover,
+[data-bm-panel] .toolbar button:hover {
+  background: var(--btn-toolbar-hover);
 }
-#bm-panel .header .close-btn {
-  border: none; font-size: 22px; line-height: 1; cursor: pointer; background: none; color: #666;
-  padding: 0 6px; border-radius: 6px;
+[data-bm-panel] .header .close-btn {
+  border: none; font-size: 22px; line-height: 1; cursor: pointer;
+  background: none; color: var(--panel-text-secondary);
+  padding: 0 var(--sp-2); border-radius: var(--r-sm);
+  transition: background var(--transition-fast);
 }
-#bm-panel .header .close-btn:hover { background: rgba(0,0,0,0.06); }
-#bm-panel .toolbar {
-  display: flex; gap: 8px; padding: 10px 18px; flex-shrink: 0;
-  border-bottom: 1px solid rgba(0,0,0,0.06); flex-wrap: wrap;
+[data-bm-panel] .header .close-btn:hover { background: var(--panel-hover); }
+[data-bm-panel] .toolbar {
+  display: flex; gap: var(--sp-2); padding: 10px 16px; flex-shrink: 0;
+  border-bottom: 1px solid var(--panel-divider); flex-wrap: wrap;
 }
-#bm-panel .search-bar {
-  padding: 10px 18px; flex-shrink: 0;
+[data-bm-panel] .search-bar {
+  padding: 10px 16px; flex-shrink: 0;
 }
-#bm-panel .search-bar input {
+[data-bm-panel] .search-bar input {
   width: 100%; box-sizing: border-box; padding: 8px 12px;
-  border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none;
-  background: #fff; color: inherit;
+  border: 1px solid var(--input-border); border-radius: var(--r-md);
+  font-size: var(--fs-lg); outline: none;
+  background: var(--input-bg); color: var(--input-text);
+  font-family: inherit;
+  transition: border-color var(--transition-fast);
 }
-#bm-panel .search-bar input:focus { border-color: #1a73e8; }
-#bm-panel .filter-row {
-  display: flex; gap: 8px; padding: 0 18px 10px; flex-shrink: 0;
+[data-bm-panel] .search-bar input:focus { border-color: var(--brand); }
+[data-bm-panel] .filter-row {
+  display: flex; gap: var(--sp-2); padding: 0 16px 10px; flex-shrink: 0;
 }
-#bm-panel .folder-select {
-  flex: 1; padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px;
-  font-size: 13px; outline: none; background: #fff; color: inherit;
+[data-bm-panel] .folder-select {
+  flex: 1; padding: 6px 10px; border: 1px solid var(--input-border);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-md); outline: none;
+  background: var(--input-bg); color: var(--input-text);
+  font-family: inherit;
 }
-#bm-panel .bookmark-list { flex: 1; overflow-y: auto; padding: 6px 12px; }
-#bm-panel .bookmark-item {
+[data-bm-panel] .bookmark-list { flex: 1; overflow-y: auto; padding: var(--sp-2) var(--sp-3); }
+[data-bm-panel] .bookmark-item {
   display: flex; align-items: flex-start; gap: 10px;
-  padding: 10px 12px; margin: 6px 8px; cursor: pointer;
-  background: rgba(255,255,255,0.85); border-radius: 8px;
-  border: 1px solid rgba(0,0,0,0.05); transition: background 0.15s;
+  padding: 10px 12px; margin: 6px var(--sp-2); cursor: pointer;
+  background: var(--card-bg); border-radius: var(--r-md);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  transition: background var(--transition-fast), transform var(--transition-fast);
 }
-#bm-panel .bookmark-item:hover { background: #fff; }
-#bm-panel .bookmark-item .content { flex: 1; min-width: 0; }
-#bm-panel .bookmark-item .title {
-  font-size: 14px; font-weight: 500; line-height: 1.4;
+[data-bm-panel] .bookmark-item:hover {
+  background: var(--card-bg);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+}
+[data-bm-panel] .bookmark-item .content { flex: 1; min-width: 0; }
+[data-bm-panel] .bookmark-item .title {
+  font-size: var(--fs-lg); font-weight: 500; line-height: 1.4;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-#bm-panel .bookmark-item .url {
-  font-size: 11px; color: #888; margin-top: 2px;
+[data-bm-panel] .bookmark-item .url {
+  font-size: var(--fs-xs); color: var(--panel-text-secondary); margin-top: 2px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-#bm-panel .bookmark-item .meta {
-  font-size: 11px; color: #888; margin-top: 4px;
+[data-bm-panel] .bookmark-item .meta {
+  font-size: var(--fs-xs); color: var(--panel-text-secondary); margin-top: 4px;
   display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
 }
-#bm-panel .bookmark-item .meta .folder-tag {
-  background: #e8f0fe; color: #1a73e8; padding: 1px 6px; border-radius: 3px; font-size: 10px;
+[data-bm-panel] .bookmark-item .meta .folder-tag {
+  background: rgba(var(--brand-rgb), 0.12); color: var(--brand);
+  padding: 1px 6px; border-radius: 3px; font-size: 10px;
 }
-@media (prefers-color-scheme: dark) {
-  #bm-panel .bookmark-item .meta .folder-tag { background: #1a3a6a; color: #8ab4f8; }
+[data-bm-panel] .bookmark-item .delete-btn {
+  background: none; border: none; cursor: pointer; font-size: 14px;
+  padding: 2px var(--sp-2); color: var(--panel-text-secondary);
+  border-radius: 4px; flex-shrink: 0;
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
-#bm-panel .bookmark-item .delete-btn {
-  background: none; border: none; cursor: pointer; font-size: 14px; padding: 2px 6px;
-  color: #999; border-radius: 4px; flex-shrink: 0;
+[data-bm-panel] .bookmark-item .delete-btn:hover { background: rgba(234,67,53,0.1); color: var(--badge-bg); }
+[data-bm-panel] .empty {
+  text-align: center; padding: 40px 20px;
+  color: var(--panel-text-secondary); font-size: var(--fs-lg);
 }
-#bm-panel .bookmark-item .delete-btn:hover { background: rgba(234,67,53,0.1); color: #ea4335; }
-#bm-panel .empty {
-  text-align: center; padding: 40px 20px; color: #999; font-size: 14px;
-}
-#bm-panel .empty .hint { font-size: 12px; margin-top: 8px; opacity: 0.7; }
-#bm-panel .toast {
+[data-bm-panel] .empty .hint { font-size: var(--fs-sm); margin-top: var(--sp-2); opacity: 0.7; }
+[data-bm-panel] .toast {
   position: fixed; top: 20px; right: 50%; transform: translateX(50%);
-  background: rgba(0,0,0,0.8); color: #fff; padding: 8px 16px; border-radius: 6px;
-  font-size: 13px; z-index: 2147483647; animation: bm-toast 0.2s ease;
+  background: rgba(0,0,0,0.8); color: #fff; padding: 8px 16px;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-md); z-index: var(--z-panel);
+  animation: bm-toast 0.2s ease;
 }
 @keyframes bm-toast { from { opacity: 0; } to { opacity: 1; } }
-@keyframes bm-slide-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
 `
 
 function openPanel() {
@@ -128,8 +149,11 @@ function openPanel() {
 
   _panel = document.createElement('div')
   _panel.id = 'bm-panel'
+  _panel.setAttribute('data-bm-panel', '')
   _panel.innerHTML = _renderHTML()
   document.body.appendChild(_panel)
+
+  requestAnimationFrame(() => _panel.classList.add('open'))
 
   _bindEvents()
   _renderFolderSelect()
@@ -138,8 +162,15 @@ function openPanel() {
 
 function closePanel() {
   if (!_panel) return
-  _panel.remove()
-  _panel = null
+  _panel.classList.remove('open')
+  setTimeout(() => {
+    if (_panel) {
+      _panel.remove()
+      _panel = null
+    }
+    const style = document.getElementById('bm-panel-style')
+    if (style) style.remove()
+  }, 250)
   if (_escListener) {
     document.removeEventListener('keydown', _escListener)
     _escListener = null
@@ -149,285 +180,215 @@ function closePanel() {
     _outsideClickListener = null
   }
   ns.ui.button.setFloatingButtonVisible(true)
-  const style = document.getElementById('bm-panel-style')
-  if (style) style.remove()
 }
 
+function isOpen() { return !!_panel }
+
 function _renderHTML() {
+  const stats = ns.storage.getStats()
+  const total = stats.total || 0
+  const folders = stats.folders || 0
   return `
     <div class="header">
       <div>
-        <h2>网址收藏</h2>
-        <div class="stats" id="bm-stats"></div>
+        <h2>📑 网址收藏</h2>
+        <div class="stats">${total} 条 · ${folders} 个文件夹</div>
       </div>
       <div class="actions">
-        <button class="import-btn" title="导入浏览器书签 HTML">导入</button>
-        <button class="export-btn" title="导出">导出</button>
-        <button class="clear-btn" title="清空">清空</button>
+        <button data-act="close" class="close-btn" aria-label="关闭">×</button>
       </div>
-      <button class="close-btn" aria-label="关闭">&times;</button>
     </div>
-    <input type="file" id="bm-file-input" accept=".html,.htm" style="display:none">
     <div class="toolbar">
-      <button class="export-md">导出 Markdown</button>
-      <button class="export-json">导出 JSON</button>
-      <button class="export-html">导出书签 HTML</button>
-      <button class="copy-md">复制 Markdown</button>
+      <button data-act="import">导入</button>
+      <button data-act="export-md">导出 MD</button>
+      <button data-act="export-json">导出 JSON</button>
+      <button data-act="export-html">导出 HTML</button>
+      <button data-act="clear">清空</button>
     </div>
     <div class="search-bar">
-      <input type="text" placeholder="搜索标题、URL、文件夹..." id="bm-search-input">
+      <input type="text" placeholder="搜索标题、URL、文件夹..." data-input="search">
     </div>
     <div class="filter-row">
-      <select class="folder-select" id="bm-folder-select">
+      <select class="folder-select" data-input="folder">
         <option value="">全部文件夹</option>
       </select>
     </div>
-    <div class="bookmark-list" id="bm-bookmark-list">
-      <div class="empty">加载中...</div>
-    </div>
+    <div class="bookmark-list" data-list></div>
   `
 }
 
 function _bindEvents() {
-  _panel.querySelector('.close-btn').addEventListener('click', closePanel)
-  _panel.querySelector('.import-btn').addEventListener('click', _onImportClick)
-  _panel.querySelector('.export-md').addEventListener('click', () => _onExportClick('markdown'))
-  _panel.querySelector('.export-json').addEventListener('click', () => _onExportClick('json'))
-  _panel.querySelector('.export-html').addEventListener('click', () => _onExportClick('html'))
-  _panel.querySelector('.copy-md').addEventListener('click', _onCopyMarkdown)
-  _panel.querySelector('.clear-btn').addEventListener('click', _onClearClick)
+  if (!_panel) return
 
-  const fileInput = _panel.querySelector('#bm-file-input')
-  fileInput.addEventListener('change', _onFileSelected)
+  _panel.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-act]')
+    if (!btn) return
+    const act = btn.dataset.act
+    if (act === 'close') { closePanel(); return }
+    if (act === 'import') return _handleImport()
+    if (act === 'export-md') return _handleExport('markdown')
+    if (act === 'export-json') return _handleExport('json')
+    if (act === 'export-html') return _handleExport('html')
+    if (act === 'clear') return _handleClear()
+    const delBtn = e.target.closest('[data-del]')
+    if (delBtn) {
+      e.stopPropagation()
+      _handleDelete(delBtn.dataset.del)
+      return
+    }
+    const item = e.target.closest('[data-id]')
+    if (item) {
+      const id = item.dataset.id
+      const bm = ns.storage.getBookmarks({}).bookmarks.find(b => b.id === id)
+      if (bm && bm.url) window.open(bm.url, '_blank', 'noopener')
+    }
+  })
+
+  const searchInput = _panel.querySelector('[data-input="search"]')
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      _currentFilter.keyword = e.target.value.trim()
+      _renderBookmarks()
+    })
+  }
+  const folderSelect = _panel.querySelector('[data-input="folder"]')
+  if (folderSelect) {
+    folderSelect.addEventListener('change', (e) => {
+      _currentFilter.folder = e.target.value
+      _renderBookmarks()
+    })
+  }
 
   _escListener = (e) => {
-    if (e.key === 'Escape' && _panel) closePanel()
+    if (e.key === 'Escape') closePanel()
   }
   document.addEventListener('keydown', _escListener)
-
-  _outsideClickListener = (e) => {
-    if (!_panel) return
-    if (_panel.contains(e.target)) return
-    const btn = document.getElementById('bm-floating-btn')
-    if (btn && btn.contains(e.target)) return
-    closePanel()
-  }
-  setTimeout(() => {
-    if (_outsideClickListener) document.addEventListener('mousedown', _outsideClickListener, true)
-  }, 0)
-
-  const searchInput = _panel.querySelector('#bm-search-input')
-  let timer = null
-  searchInput.addEventListener('input', () => {
-    clearTimeout(timer)
-    timer = setTimeout(() => {
-      _currentFilter.keyword = searchInput.value.trim()
-      _renderBookmarks()
-    }, 250)
-  })
-
-  const folderSelect = _panel.querySelector('#bm-folder-select')
-  folderSelect.addEventListener('change', () => {
-    _currentFilter.folder = folderSelect.value
-    _renderBookmarks()
-  })
 }
 
 function _renderFolderSelect() {
   if (!_panel) return
-  const select = _panel.querySelector('#bm-folder-select')
-  if (!select) return
+  const sel = _panel.querySelector('[data-input="folder"]')
+  if (!sel) return
   const folders = ns.storage.getFolders()
-  select.innerHTML = '<option value="">全部文件夹</option>' +
-    folders.map(f => `<option value="${ns.format.escapeHtml(f)}">${ns.format.escapeHtml(f || '未分类')}</option>`).join('')
-  select.value = _currentFilter.folder || ''
-}
-
-function _renderStats() {
-  if (!_panel) return
-  const el = _panel.querySelector('#bm-stats')
-  if (!el) return
-  const stats = ns.storage.getStats()
-  el.textContent = `共 ${stats.total} 条 · ${stats.folders} 个文件夹`
+  sel.innerHTML = '<option value="">全部文件夹</option>' +
+    folders.map(f => `<option value="${escapeAttr(f)}">${escapeHtml(f)}</option>`).join('')
+  if (_currentFilter.folder) sel.value = _currentFilter.folder
 }
 
 function _renderBookmarks() {
   if (!_panel) return
-  const listEl = _panel.querySelector('#bm-bookmark-list')
-  if (!listEl) return
-  _renderStats()
-
-  const result = ns.storage.getBookmarks({
-    folder: _currentFilter.folder || undefined,
-    keyword: _currentFilter.keyword || undefined,
-    limit: (ns.config.getConfig('ui.maxDisplay') || 100),
+  const list = _panel.querySelector('[data-list]')
+  if (!list) return
+  const { bookmarks, total } = ns.storage.getBookmarks({
+    folder: _currentFilter.folder,
+    keyword: _currentFilter.keyword,
   })
-
-  if (result.bookmarks.length === 0) {
-    listEl.innerHTML = `
-      <div class="empty">
-        暂无书签
-        <div class="hint">点击右上角"导入"，选择浏览器导出的 bookmarks.html</div>
-      </div>
-    `
+  if (total === 0) {
+    list.innerHTML = `<div class="empty">${_currentFilter.keyword || _currentFilter.folder ? '没有匹配的项' : '暂无书签'}
+      <div class="hint">点击"导入"按钮添加书签</div></div>`
     return
   }
-
-  listEl.innerHTML = result.bookmarks.map(b => `
-    <div class="bookmark-item" data-id="${ns.format.escapeHtml(b.id)}" data-url="${ns.format.escapeHtml(b.url)}">
+  list.innerHTML = bookmarks.map(b => `
+    <div class="bookmark-item" data-id="${escapeAttr(b.id)}" title="${escapeAttr(b.url || '')}">
       <div class="content">
-        <div class="title" title="${ns.format.escapeHtml(b.url)}">${ns.format.escapeHtml(b.title || b.url)}</div>
-        <div class="url">${ns.format.escapeHtml(b.url)}</div>
-        <div class="meta">
-          ${b.folderPath || b.folder ? `<span class="folder-tag">${ns.format.escapeHtml(b.folderPath || b.folder)}</span>` : ''}
-          ${b.addDate ? `<span>${ns.format.formatTime(b.addDate)}</span>` : ''}
-          ${b.tags && b.tags.length ? b.tags.map(t => `<span class="folder-tag">#${ns.format.escapeHtml(t)}</span>`).join('') : ''}
-        </div>
+        <div class="title">${escapeHtml(b.title || b.url || '(无标题)')}</div>
+        <div class="url">${escapeHtml(b.url || '')}</div>
+        ${b.folder ? `<div class="meta"><span class="folder-tag">${escapeHtml(b.folder)}</span></div>` : ''}
       </div>
-      <button class="delete-btn" title="删除" data-id="${ns.format.escapeHtml(b.id)}">&times;</button>
+      <button class="delete-btn" data-del="${escapeAttr(b.id)}" title="删除">×</button>
     </div>
   `).join('')
-
-  listEl.querySelectorAll('.bookmark-item').forEach(el => {
-    el.addEventListener('click', (e) => {
-      if (e.target.closest('.delete-btn')) return
-      const url = el.dataset.url
-      if (url) {
-        try { GM_openInTab(url) } catch (err) {
-          try { window.open(url, '_blank') } catch (e2) {}
-        }
-      }
-    })
-    const delBtn = el.querySelector('.delete-btn')
-    delBtn.addEventListener('click', (e) => {
-      e.stopPropagation()
-      const id = delBtn.dataset.id
-      ns.storage.removeBookmarks([id])
-      _renderBookmarks()
-      _renderFolderSelect()
-      _toast('已删除')
-    })
-  })
 }
 
-function _toast(msg) {
-  if (!_panel) return
-  const t = document.createElement('div')
-  t.className = 'toast'
-  t.textContent = msg
-  _panel.appendChild(t)
-  setTimeout(() => t.remove(), 1500)
-}
-
-function _onImportClick() {
-  const input = _panel.querySelector('#bm-file-input')
-  if (input) input.click()
-}
-
-function _onFileSelected(e) {
-  const file = e.target.files && e.target.files[0]
-  if (!file) return
-  const reader = new FileReader()
-  reader.onload = () => {
-    try {
-      const html = String(reader.result || '')
-      const items = ns.parser.parseBookmarksHtml(html)
-      if (!items.length) {
-        _toast('未解析到书签')
-        return
-      }
-      const r = ns.storage.addBookmarks(items)
-      _renderBookmarks()
-      _renderFolderSelect()
-      _toast(`新增 ${r.added}，更新 ${r.updated}`)
+function _handleImport() {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.html,text/html'
+  input.onchange = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
       try {
-        GM_notification({
-          title: '导入完成',
-          text: `新增 ${r.added}，更新 ${r.updated}，跳过 ${r.skipped}`,
-          timeout: 4000,
-        })
-      } catch (e) {}
-    } catch (err) {
-      _toast('解析失败: ' + (err.message || err))
-    } finally {
-      e.target.value = ''
+        const result = ns.parser.parseNetscapeBookmarks(ev.target.result)
+        const added = ns.storage.addBookmarks(result)
+        _showToast(`导入完成：${added.length} 条`)
+        _renderFolderSelect()
+        _renderBookmarks()
+      } catch (err) {
+        _showToast('导入失败：' + err.message)
+      }
+    }
+    reader.readAsText(file)
+  }
+  input.click()
+}
+
+function _handleExport(format) {
+  const cfg = ns.config.getConfig() || {}
+  const { bookmarks } = ns.storage.getBookmarks({})
+  if (!bookmarks.length) {
+    _showToast('暂无书签')
+    return
+  }
+  if (format === 'markdown') {
+    const md = ns.format.generateMarkdown(bookmarks, {
+      groupBy: (cfg.export && cfg.export.groupBy) || 'folder',
+      includeTimestamp: cfg.export ? cfg.export.includeTimestamp !== false : true,
+    })
+    GM_setClipboard(md)
+    _showToast(`已复制 Markdown (${bookmarks.length} 条)`)
+  } else if (format === 'json') {
+    const json = ns.format.generateJSON(bookmarks)
+    GM_setClipboard(json)
+    _showToast(`已复制 JSON (${bookmarks.length} 条)`)
+  } else if (format === 'html') {
+    const html = ns.format.generateNetscapeHtml(bookmarks)
+    try {
+      GM_download({
+        url: 'data:text/html;charset=utf-8,' + encodeURIComponent(html),
+        name: 'bookmarks.html',
+        saveAs: true,
+      })
+    } catch (e) {
+      _showToast('导出失败：' + e.message)
     }
   }
-  reader.onerror = () => _toast('读取文件失败')
-  reader.readAsText(file, 'utf-8')
 }
 
-function _onExportClick(format) {
-  const { bookmarks } = ns.storage.getBookmarks({})
-  if (!bookmarks.length) {
-    _toast('暂无书签')
-    return
-  }
-  const cfg = ns.config.getConfig() || {}
-  const groupBy = (cfg.export && cfg.export.groupBy) || 'folder'
-  const includeTs = cfg.export ? cfg.export.includeTimestamp !== false : true
-  let content, filename, mime
-  if (format === 'markdown') {
-    content = ns.format.generateMarkdown(bookmarks, { groupBy, includeTimestamp: includeTs })
-    filename = `bookmarks-${_dateStr()}.md`
-    mime = 'text/markdown'
-  } else if (format === 'json') {
-    content = ns.format.generateJSON(bookmarks)
-    filename = `bookmarks-${_dateStr()}.json`
-    mime = 'application/json'
-  } else {
-    content = ns.format.generateNetscapeHtml(bookmarks)
-    filename = `bookmarks-${_dateStr()}.html`
-    mime = 'text/html'
-  }
-  try {
-    GM_download({ url: 'data:' + mime + ';charset=utf-8,' + encodeURIComponent(content), name: filename, saveAs: true })
-    ns.storage.logExport({ format, count: bookmarks.length, filename })
-    _toast('已导出 ' + filename)
-  } catch (e) {
-    _toast('导出失败: ' + (e.message || e))
-  }
-}
-
-function _onCopyMarkdown() {
-  const { bookmarks } = ns.storage.getBookmarks({})
-  if (!bookmarks.length) {
-    _toast('暂无书签')
-    return
-  }
-  const cfg = ns.config.getConfig() || {}
-  const md = ns.format.generateMarkdown(bookmarks, {
-    groupBy: (cfg.export && cfg.export.groupBy) || 'folder',
-    includeTimestamp: cfg.export ? cfg.export.includeTimestamp !== false : true,
-  })
-  try {
-    GM_setClipboard(md)
-    _toast('Markdown 已复制')
-  } catch (e) {
-    _toast('复制失败: ' + (e.message || e))
-  }
-}
-
-function _onClearClick() {
-  if (!confirm('确定清空所有书签？此操作不可恢复')) return
+function _handleClear() {
+  if (typeof confirm === 'function' && !confirm('确定清空所有书签？')) return
   ns.storage.clearAll()
-  _currentFilter = { folder: '', keyword: '' }
-  const sel = _panel.querySelector('#bm-folder-select')
-  if (sel) sel.value = ''
-  const input = _panel.querySelector('#bm-search-input')
-  if (input) input.value = ''
+  _showToast('已清空所有书签')
+  _renderFolderSelect()
+  _renderBookmarks()
+}
+
+function _handleDelete(id) {
+  if (typeof confirm === 'function' && !confirm('确定删除该书签？')) return
+  ns.storage.removeBookmarks([id])
   _renderBookmarks()
   _renderFolderSelect()
-  _toast('已清空')
 }
 
-function _dateStr() {
-  const d = new Date()
-  return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}-${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}`
+function _showToast(msg) {
+  const toast = document.createElement('div')
+  toast.className = 'toast'
+  toast.textContent = msg
+  toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:#fff;padding:8px 16px;border-radius:6px;font-size:13px;z-index:2147483647;'
+  document.body.appendChild(toast)
+  setTimeout(() => toast.remove(), 3000)
 }
 
-function _renderArticles() { _renderBookmarks() }
+function escapeHtml(s) {
+  if (s == null) return ''
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+}
+
+function escapeAttr(s) { return escapeHtml(s) }
 
 ns.ui = ns.ui || {}
-ns.ui.panel = { openPanel, closePanel, _renderBookmarks, _renderArticles }
+ns.ui.panel = { openPanel, closePanel, isOpen, _renderBookmarks, _renderFolderSelect }
 })(BookmarkLogger)
