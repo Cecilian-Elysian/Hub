@@ -9,57 +9,54 @@ let _btnRefreshing = false
 let _btnLastFetch = 0
 
 const BTN_STYLE = `
-#na-floating-btn {
+[data-na-btn] {
   position: fixed;
-  z-index: 2147483647;
+  z-index: var(--z-floating);
   height: 44px;
   min-width: 44px;
-  border-radius: 22px;
-  background: #ec4899;
+  border-radius: var(--r-full);
+  background: var(--brand);
   color: #fff;
   border: none;
   cursor: pointer;
-  box-shadow: 0 2px 12px rgba(236, 72, 153, 0.35);
+  box-shadow: var(--shadow-btn);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   padding: 0 14px;
-  font-size: 14px;
+  font-size: var(--fs-lg);
   font-weight: 500;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: var(--font-stack);
   line-height: 1;
   letter-spacing: 0.5px;
-  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
   user-select: none;
   touch-action: none;
   -webkit-user-select: none;
 }
-#na-floating-btn:hover {
+[data-na-btn]:hover {
   transform: scale(1.05);
-  background: #db2777;
-  box-shadow: 0 4px 20px rgba(236, 72, 153, 0.5);
+  background: var(--brand-hover);
+  box-shadow: var(--shadow-btn-hover);
 }
-#na-floating-btn svg.na-icon {
+[data-na-btn] svg.na-icon {
   width: 20px;
   height: 20px;
   fill: currentColor;
   flex-shrink: 0;
 }
-#na-floating-btn .label {
-  display: inline-block;
-  white-space: nowrap;
-}
-#na-floating-btn .badge {
+[data-na-btn] .label { display: inline-block; white-space: nowrap; }
+[data-na-btn] .badge {
   position: absolute;
   top: -4px;
   right: -4px;
   min-width: 18px;
   height: 18px;
-  border-radius: 9px;
-  background: #ea4335;
+  border-radius: var(--r-full);
+  background: var(--badge-bg);
   color: #fff;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   line-height: 18px;
   text-align: center;
   padding: 0 4px;
@@ -67,24 +64,22 @@ const BTN_STYLE = `
   display: none;
   font-family: inherit;
 }
-#na-floating-btn .badge.show {
-  display: block;
-}
-#na-floating-btn .spin-icon {
+[data-na-btn] .badge.show { display: block; }
+[data-na-btn] .spin-icon {
   position: absolute;
   top: -4px;
   left: -4px;
   width: 16px;
   height: 16px;
-  border: 2px solid #1a73e8;
+  border: 2px solid var(--brand);
   border-top-color: transparent;
   border-radius: 50%;
   display: none;
   animation: na-btn-spin 0.8s linear infinite;
   background: #fff;
 }
-#na-floating-btn.refreshing .spin-icon { display: block; }
-#na-floating-btn.refreshing .badge { display: none !important; }
+[data-na-btn].refreshing .spin-icon { display: block; }
+[data-na-btn].refreshing .badge { display: none !important; }
 @keyframes na-btn-spin { to { transform: rotate(360deg); } }
 `
 
@@ -92,12 +87,6 @@ const NEWSPAPER_SVG = '<svg class="na-icon" viewBox="0 0 24 24" xmlns="http://ww
 
 function createFloatingButton(onClick) {
   if (_btn) return _btn
-
-  console.log('[NewsUI] createFloatingButton called', {
-    readyState: document.readyState,
-    hasBody: !!document.body,
-    hasHead: !!document.head,
-  })
 
   try {
     if (!document.getElementById('na-floating-btn-style')) {
@@ -110,6 +99,7 @@ function createFloatingButton(onClick) {
     _btn = document.createElement('button')
     _btn.id = 'na-floating-btn'
     _btn.type = 'button'
+    _btn.setAttribute('data-na-btn', '')
     _btn.setAttribute('aria-label', '新闻聚合')
     _btn.title = '新闻聚合'
     _btn.innerHTML = NEWSPAPER_SVG + '<span class="label">新闻</span>'
@@ -125,9 +115,9 @@ function createFloatingButton(onClick) {
     const pos = ns.config.getConfig('ui.position') || 'bottom-right'
     const positions = {
       'bottom-right': { bottom: '20px', right: '20px' },
-      'bottom-left': { bottom: '20px', left: '20px' },
-      'top-right': { top: '20px', right: '20px' },
-      'top-left': { top: '20px', left: '20px' },
+      'bottom-left':  { bottom: '20px', left: '20px' },
+      'top-right':    { top: '20px', right: '20px' },
+      'top-left':     { top: '20px', left: '20px' },
     }
     Object.assign(_btn.style, positions[pos] || positions['bottom-right'])
 
@@ -140,18 +130,12 @@ function createFloatingButton(onClick) {
 
     const mount = document.body || document.documentElement
     mount.appendChild(_btn)
-    console.log('[NewsUI] button appended', mount === document.body ? 'body' : 'documentElement')
   } catch (e) {
     console.error('[NewsUI] createFloatingButton failed:', e)
     return null
   }
 
-  try {
-    updateBadge()
-  } catch (e) {
-    console.error('[NewsUI] updateBadge failed:', e)
-  }
-
+  try { updateBadge() } catch (e) { console.error('[NewsUI] updateBadge failed:', e) }
   return _btn
 }
 
