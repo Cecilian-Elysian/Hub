@@ -36,6 +36,7 @@ const FILE_LIST = [
   'src/utils/notify.js',
   'src/utils/hotkey.js',
   'src/icons/lucide.js',
+  'src/styles/tokens.css',
   'src/core/storage.js',
   'src/core/takeover.js',
   'src/core/detector.js',
@@ -126,7 +127,17 @@ function checkUndefinedReferences(code, label) {
 function concatFiles(fileList) {
   const parts = []
   for (const f of fileList) {
-    const content = readFileSync(join(__dirname, f), 'utf-8').trim()
+    let content = readFileSync(join(__dirname, f), 'utf-8').trim()
+    if (f.endsWith('.css')) {
+      content = ';(function() {\n' +
+        '  try {\n' +
+        '    var __style = document.createElement("style");\n' +
+        '    __style.setAttribute("data-cathub-tokens", "' + f.replace(/[^\w.-]/g, '_') + '");\n' +
+        '    __style.textContent = ' + JSON.stringify(content) + ';\n' +
+        '    (document.head || document.documentElement).appendChild(__style);\n' +
+        '  } catch (e) {}\n' +
+        '})();'
+    }
     parts.push('// === ' + f + ' ===')
     parts.push(content)
     parts.push('')
@@ -141,8 +152,9 @@ function build() {
   console.log('Building hub.user.js...')
   const body = concatFiles(FILE_LIST)
   const output = HEADER + '\n' + body
-  checkSyntax(output, 'hub')
-  checkUndefinedReferences(body, 'hub')
+  const jsBody = concatFiles(FILE_LIST.filter(f => !f.endsWith('.css')))
+  checkSyntax(jsBody, 'hub')
+  checkUndefinedReferences(jsBody, 'hub')
 
   const outPath = join(__dirname, 'dist', 'hub.user.js')
   writeFileSync(outPath, output, 'utf-8')

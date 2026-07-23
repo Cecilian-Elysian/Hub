@@ -1,0 +1,97 @@
+/* Cecilian Design Tokens - Hub (蓝紫粉渐变 #3b82f6→#8b5cf6→#ec4899)
+ *
+ * 通过 [data-cat-hub-panel] 作用域限定，避免污染宿主页面。
+ * 在 UI 文件中以 IIFE 注入到 <style> 元素。
+ */
+
+[data-cat-hub-panel],
+[data-cat-hub-btn] {
+  /* === Spacing scale === */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+
+  /* === Radius scale === */
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-full: 999px;
+
+  /* === Typography === */
+  --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+                "Noto Sans CJK SC", sans-serif;
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-md: 13px;
+  --fs-lg: 14px;
+  --fs-xl: 16px;
+  --fs-2xl: 18px;
+
+  /* === Z-index === */
+  --z-floating: 2147483646;
+  --z-panel: 2147483647;
+
+  /* === Shadows === */
+  --shadow-panel: -8px 0 32px rgba(0, 0, 0, 0.24);
+  --shadow-btn: 0 2px 12px rgba(124, 58, 237, 0.35);
+  --shadow-btn-hover: 0 4px 20px rgba(124, 58, 237, 0.5);
+
+  /* === Animation === */
+  --transition-fast: 0.15s ease;
+  --transition-medium: 0.2s ease;
+  --transition-panel: 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* === Brand: Hub 蓝紫粉三色渐变 === */
+  --brand-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+  --brand: #7c3aed;
+  --brand-hover: #6d28d9;
+  --brand-rgb: 124, 58, 237;
+  --badge-bg: #ea4335;
+
+  /* === Panel === */
+  --panel-width: 420px;
+  --panel-blur: 16px;
+  --panel-bg: rgba(255, 255, 255, 0.88);
+  --panel-border: 1px solid rgba(0, 0, 0, 0.08);
+  --panel-text: #1c1c1e;
+  --panel-text-secondary: #6b7280;
+  --panel-divider: rgba(0, 0, 0, 0.06);
+  --panel-hover: rgba(124, 58, 237, 0.08);
+  --input-bg: #ffffff;
+  --input-border: #d1d5db;
+  --input-text: #1c1c1e;
+
+  /* === Card === */
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --card-border: rgba(0, 0, 0, 0.05);
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  /* === Button (toolbar) === */
+  --btn-toolbar-bg: rgba(124, 58, 237, 0.15);
+  --btn-toolbar-border: transparent;
+  --btn-toolbar-text: #7c3aed;
+  --btn-toolbar-hover: rgba(124, 58, 237, 0.3);
+}
+
+[data-cat-hub-panel].dark,
+[data-cat-hub-panel][data-theme="dark"] {
+  --panel-bg: rgba(28, 28, 30, 0.94);
+  --panel-border: 1px solid rgba(255, 255, 255, 0.12);
+  --panel-text: #f5f5f7;
+  --panel-text-secondary: #9ca3af;
+  --panel-divider: rgba(255, 255, 255, 0.08);
+  --panel-hover: rgba(124, 58, 237, 0.18);
+  --input-bg: #2a2a2e;
+  --input-border: #48484a;
+  --input-text: #f5f5f7;
+  --card-bg: rgba(44, 44, 46, 0.88);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --btn-toolbar-bg: rgba(124, 58, 237, 0.25);
+  --btn-toolbar-text: #a78bfa;
+  --btn-toolbar-hover: rgba(124, 58, 237, 0.4);
+}

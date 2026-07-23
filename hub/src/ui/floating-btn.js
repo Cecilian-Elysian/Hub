@@ -8,64 +8,64 @@ let _mouseDownTime = 0
 let _mouseDownPos = { x: 0, y: 0 }
 
 const BTN_STYLE = `
-#cat-hub-floating-btn {
+[data-cat-hub-btn] {
   position: fixed;
-  z-index: 2147483647;
+  z-index: var(--z-floating);
   height: 44px;
   min-width: 44px;
-  border-radius: 22px;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+  border-radius: var(--r-full);
+  background: var(--brand-gradient);
   color: #fff;
   border: none;
   cursor: pointer;
-  box-shadow: 0 2px 12px rgba(124, 58, 237, 0.35);
+  box-shadow: var(--shadow-btn);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   padding: 0 14px;
-  font-size: 14px;
+  font-size: var(--fs-lg);
   font-weight: 500;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: var(--font-stack);
   line-height: 1;
   letter-spacing: 0.5px;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   user-select: none;
   touch-action: none;
   -webkit-user-select: none;
 }
-#cat-hub-floating-btn:hover {
+[data-cat-hub-btn]:hover {
   transform: scale(1.05);
-  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.5);
+  box-shadow: var(--shadow-btn-hover);
 }
-#cat-hub-floating-btn .ch-icon {
+[data-cat-hub-btn] .ch-icon {
   width: 20px;
   height: 20px;
   stroke: currentColor;
   fill: none;
   flex-shrink: 0;
 }
-#cat-hub-floating-btn .label {
+[data-cat-hub-btn] .label {
   display: inline-block;
   white-space: nowrap;
 }
-#cat-hub-floating-btn .badge {
+[data-cat-hub-btn] .badge {
   position: absolute;
   top: -4px;
   right: -4px;
   min-width: 18px;
   height: 18px;
-  border-radius: 9px;
-  background: #ea4335;
+  border-radius: var(--r-full);
+  background: var(--badge-bg);
   color: #fff;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   line-height: 18px;
   text-align: center;
   padding: 0 4px;
   font-weight: 600;
   display: none;
 }
-#cat-hub-floating-btn .badge.show { display: block; }
+[data-cat-hub-btn] .badge.show { display: block; }
 `
 
 function createFloatingButton(onClick) {
@@ -83,6 +83,7 @@ function createFloatingButton(onClick) {
     _btn = document.createElement('button')
     _btn.id = ns.constants.UI.BUTTON_ID
     _btn.type = 'button'
+    _btn.setAttribute('data-cat-hub-btn', '')
     _btn.setAttribute('aria-label', 'Cecilian 脚本集')
     _btn.title = 'Cecilian 脚本集'
     _btn.innerHTML = ns.icons.get('cat') + '<span class="label">Hub</span>'
